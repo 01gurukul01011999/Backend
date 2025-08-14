@@ -12,7 +12,7 @@ import multer from "multer";
 // Storage config
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
-    cb(null, '../Frontend/public/uploads');
+    cb(null, ' process.env.UPLOAD_LOCATION');
   },
   filename: function (req, file, cb) {
     const uniqueName = Date.now() + '-' + file.originalname;
