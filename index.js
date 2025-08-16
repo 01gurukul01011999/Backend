@@ -24,7 +24,6 @@ const storage = multer.diskStorage({
 const upload = multer({ storage });
 
 
-
  // or configure as needed
 
 dotenv.config();
@@ -35,18 +34,22 @@ app.use(bodyPrser.json());
 app.use(cors());
 app.use('/uploads', express.static('public/uploads'));
 
-const db = mysql.createConnection({
-    host: process.env.DB_HOST, 
+const db = mysql.createPool({
+    connectionLimit: 10, // Adjust as needed
+    host: process.env.DB_HOST,
     user: process.env.DB_USER,
     password: process.env.DB_PASSWORD,
     database: process.env.DB_NAME
-}); 
-db.connect((err) => {
+});
+// Test the pool connection
+db.getConnection((err, connection) => {
     if (err) {
-        console.error("Database connection failed:", err);
-        return;
+        console.error('Database connection failed:', err);
+    } else {
+        console.log('Connected to the database');
+        connection.release();
     }
-    console.log("Connected to the database");})
+});
 const PORT = process.env.PORT || 4000;
 
 const JWT_SECRET = 'kishan';
@@ -104,7 +107,7 @@ app.post("/user-data", (req, res) => {
                         //avatar: user.avatar
                     }, // payload
                     JWT_SECRET,
-                    { expiresIn: 3600 } // token expiry
+                    { expiresIn: 86400 } // token expiry
                 );
 
   res.json({ token });
